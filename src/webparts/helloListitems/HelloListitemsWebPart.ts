@@ -98,8 +98,34 @@ export default class HelloListitemsWebPart extends BaseClientSideWebPart<IHelloL
       });
 }
 
-  private _readListItem(): void {this._operationResults.innerHTML =
-    "Read: Not Implemented";
+  private _readListItem(): void {
+    const id: number = 1;
+    this._getListItem(id).then(listItem => {
+      this._operationResults.innerHTML = `
+      <div>
+        Read list item <br/>
+        Title: ${listItem.Title} <br/>
+        Info: ${listItem.Info}
+      </div>
+      `;
+    })
+    .catch(error =>{
+      this._operationResults.innerHTML = "Read: Operation failed. " + error.message;
+    });
+   }
+
+   private _getListItem(id: number) : Promise<ISPListItem>{
+    const url: string = this.context.pageContext.site.absoluteUrl+
+    "/_api/web/lists/getbytitle('MyList')/items?$select=Title,Id,Info&$filter=Id eq " + id;
+    return this.context.spHttpClient.get(url, SPHttpClient.configurations.v1)
+    .then((response: SPHttpClientResponse) => {
+      return response.json();
+    })
+     .then((listItems: any ) => {
+       const untypedItem: any = listItems.value[0];
+       const listItem: ISPListItem = untypedItem as ISPListItem;
+       return listItem;
+     }) as Promise <ISPListItem>;
    }
 
    private _updateListItem(): void {this._operationResults.innerHTML =
