@@ -1,5 +1,5 @@
 import { Version } from '@microsoft/sp-core-library';
-import { SPHttpClient, ISPHttpClientOptions, SPHttpClientResponse } from '@microsoft/sp-http';
+import { SPHttpClient, ISPHttpClientOptions, SPHttpClientResponse, SPHttpClientConfiguration } from '@microsoft/sp-http';
 import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
@@ -75,9 +75,28 @@ export default class HelloListitemsWebPart extends BaseClientSideWebPart<IHelloL
      }
     };
   
-  private _createListItem(): void {this._operationResults.innerHTML =
-   "Create: Not Implemented";
-  }
+  private _createListItem(): void {
+    const url: string = this.context.pageContext.site.absoluteUrl+
+    "/_api/web/lists/getbytitle('MyList')/items";
+    const itemDefinition: any ={
+      "Title": "SPFX created item",
+      "Info": "Info Column Value"
+    };
+    const spHttpClientOptions : ISPHttpClientOptions = {
+      "body": JSON.stringify(itemDefinition)
+     };
+     this.context.spHttpClient.post(url, SPHttpClient.configurations.v1,
+      spHttpClientOptions)
+      .then((response: SPHttpClientResponse) => {
+        if(response.status === 201){
+          this._operationResults.innerHTML ="Create: List item created successfully.";
+          this._readAllItems();
+        }else{
+          this._operationResults.innerHTML ="Create: List item created failed." +
+          response.status + " - " + response.statusText;
+        }
+      });
+}
 
   private _readListItem(): void {this._operationResults.innerHTML =
     "Read: Not Implemented";
