@@ -51,7 +51,45 @@ export default class HelloListitemsWebPart extends BaseClientSideWebPart<IHelloL
   private _itemsList: HTMLUListElement = null;
   private _operationSelect: HTMLSelectElement = null;
   private _operationResults: HTMLParagraphElement = null;
-  private _runOperation(): void{ alert("Not Implemented")};
+  private _runOperation(): void{
+     const operation: HTMLOptionElement =
+      this._operationSelect[this._operationSelect.selectedIndex] as
+      HTMLOptionElement;
+     this._createListItem = this._createListItem.bind(this);
+     this._readListItem = this._readListItem.bind(this);
+     this._updateListItem = this._updateListItem.bind(this);
+     this._deleteListItem = this._deleteListItem.bind(this);
+     switch(operation.value){
+       case "Create":
+       this._createListItem();
+       break;
+       case "Read":
+       this._readListItem();
+       break;
+       case "Update":
+       this._updateListItem();
+       break;
+       case "Delete":
+       this._deleteListItem();
+       break;
+     }
+    };
+  
+  private _createListItem(): void {this._operationResults.innerHTML =
+   "Create: Not Implemented";
+  }
+
+  private _readListItem(): void {this._operationResults.innerHTML =
+    "Read: Not Implemented";
+   }
+
+   private _updateListItem(): void {this._operationResults.innerHTML =
+    "Update: Not Implemented";
+   }
+
+   private _deleteListItem(): void {this._operationResults.innerHTML =
+    "Delete: Not Implemented";
+   }
 
   private _readAllItems(): void{
     this._getListItems().then(listItems => {
@@ -66,7 +104,6 @@ export default class HelloListitemsWebPart extends BaseClientSideWebPart<IHelloL
   private _getListItems(): Promise<ISPListItem[]>{
     const url: string = this.context.pageContext.site.absoluteUrl+
     "/_api/web/lists/getbytitle('MyList')/items";
-    debugger;
     return this.context.spHttpClient.get(url,SPHttpClient.configurations.v1)
     .then(response => {
       return response.json();
