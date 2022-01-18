@@ -153,8 +153,29 @@ export default class HelloListitemsWebPart extends BaseClientSideWebPart<IHelloL
     });
    }
 
-   private _deleteListItem(): void {this._operationResults.innerHTML =
-    "Delete: Not Implemented";
+   private _deleteListItem(): void {
+    const url: string = this.context.pageContext.site.absoluteUrl+
+    "/_api/web/lists/getbytitle('MyList')/items(1)";
+    const itemDefinition : any = {
+      "Title": "Modified title field value!"
+    };
+    const headers : any = {
+      "X-HTTP-Method": "DELETE",
+      "IF-MATCH": "*",
+    };
+    const spHttpClientOptions: ISPHttpClientOptions = {
+      "headers": headers
+    };
+    this.context.spHttpClient.post(url, SPHttpClient.configurations.v1, spHttpClientOptions)
+    .then((response: SPHttpClientResponse) => {
+      if(response.status === 204){
+        this._operationResults.innerHTML = "Delete: List item deleted successfully.";
+        this._readAllItems();
+      } else {
+        this._operationResults.innerHTML = "Delete: List Item delete failed. "
+        + response.status + " - " + response.statusText;
+      }
+    });
    }
 
   private _readAllItems(): void{
