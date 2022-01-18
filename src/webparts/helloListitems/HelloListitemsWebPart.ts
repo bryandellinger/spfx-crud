@@ -128,8 +128,29 @@ export default class HelloListitemsWebPart extends BaseClientSideWebPart<IHelloL
      }) as Promise <ISPListItem>;
    }
 
-   private _updateListItem(): void {this._operationResults.innerHTML =
-    "Update: Not Implemented";
+   private _updateListItem(): void {
+    const url: string = this.context.pageContext.site.absoluteUrl+
+    "/_api/web/lists/getbytitle('MyList')/items(1)";
+    const itemDefinition : any = {
+      "Title": "Modified Title Field Value!"
+    };
+    const headers : any = {
+      "X-HTTP-Method": "MERGE",
+      "IF-MATCH": "*",
+    };
+    const spHttpClientOptions: ISPHttpClientOptions = {
+      "headers": headers,
+      "body": JSON.stringify(itemDefinition)
+    };
+    this.context.spHttpClient.post(url, SPHttpClient.configurations.v1, spHttpClientOptions)
+    .then((response: SPHttpClientResponse) => {
+      if(response.status === 204){
+        this._operationResults.innerHTML = "Update: List item updated successfully.";
+      } else {
+        this._operationResults.innerHTML = "Update: List Item update failed. "
+        + response.status + " - " + response.statusText;
+      }
+    });
    }
 
    private _deleteListItem(): void {this._operationResults.innerHTML =
